@@ -16,19 +16,26 @@ public class TicTacToe
         int colMove = -1;
         boolean continueGame = true;
         String setPlayer = "X";
+        int moveCnt = 0;
+
+        do {
+            // Clear the board
+            clearBoard();
+
+            // set the player
+            setPlayer = "X";
+
+            // initialize a move counter
+            moveCnt = 0;
+
+            // initialize other variables
+            rowMove = -1;
+            colMove = -1;
+            continueGame = true;
 
             do {
-                // Clear the board
-                clearBoard();
                 // Show the board
-                display(rowMove, colMove, setPlayer);
-                // initialize a move counter
-                int moveCnt = 0;
-                // Set player to X
-                if (setPlayer.equals("O"))
-                {
-                    setPlayer = "X";
-                }
+                display(rowMove, colMove, moveCnt);
 
                 do {
                     // Get coordinates with rangedint (1-3)
@@ -37,55 +44,56 @@ public class TicTacToe
 
                     // Convert to (0-2) by substracting 1
 
-                    rowMove --;
-                    colMove --;
+                    rowMove--;
+                    colMove--;
 
                 } while (!isValidMove(rowMove, colMove));
 
                 // show the change on the board
-                if (setPlayer.equals("X"))
-                {
+                if (setPlayer.equals("X")) {
                     board[rowMove][colMove] = "X";
-                }
-                else
-                {
+                } else {
                     board[rowMove][colMove] = "O";
                 }
-                moveCnt ++;
+                moveCnt++;
 
                 // If move counter is > 4, check for a win
-                if (moveCnt > 4)
-                {
-                    if (isWin(setPlayer))
-                    {
-                        if (setPlayer.equals("X"))
-                        {
+                if (moveCnt > 4) {
+                    if (isWin(setPlayer)) {
+                        if (setPlayer.equals("X")) {
                             System.out.println("Player X wins!");
-                        }
-                        else
-                        {
+                        } else {
                             System.out.println("Player O wins!");
                         }
-                        continueGame = SafeInput.getYNConfirm(in, "Play again? ");
+                        break;
                     }
                 }
 
-
                 // If move counter is 9, check for a tie
+
+                if (moveCnt == 9)
+                {
+                    if (isTie(moveCnt, setPlayer))
+                    {
+                        System.out.println("It's a tie!");
+                    }
+                    break;
+                }
                 // If there is a tie, announce it, and prompt players to play again?
 
                 // Toggle the player
-                if (setPlayer.equals("X"))
-                {
+                if (setPlayer.equals("X")) {
                     setPlayer = "O";
-                }
-                else
-                {
+                } else {
                     setPlayer = "X";
                 }
 
 
-            } while (continueGame);
+            } while (moveCnt > 0);
+
+            continueGame = SafeInput.getYNConfirm(in, "Do you want to play again? ");
+
+        } while (continueGame);
 
     }
 
@@ -98,7 +106,7 @@ public class TicTacToe
             }
     }
 
-    private static void display(int rowMove, int colMove, String setPlayer) // sets all board elements to a space
+    private static void display(int rowMove, int colMove, int moveCnt) // sets all board elements to a space
     {
         for (int row = 0; row < ROW; row++)
         {
@@ -110,16 +118,16 @@ public class TicTacToe
                 }
                 if (row == rowMove && col == colMove)
                 {
-                    if (setPlayer.equals("X"))
-                    {
-                        board[row][col] = "X";
-                    }
-                    if (setPlayer.equals("O"))
+                    if (moveCnt % 2 == 0)
                     {
                         board[row][col] = "O";
                     }
+                    else
+                    {
+                        board[row][col] = "X";
+                    }
                 }
-                else
+                else if (!board[row][col].equals("X") && !board[row][col].equals("O"))
                 {
                     board[row][col] = " "; // make this cell a space
                 }
@@ -162,7 +170,7 @@ public class TicTacToe
     {
         for(int col=0; col < COL; col++)
         {
-            if (board[0][col].equals(player) && board[0][col].equals(player) && board[0][col].equals(player)) {
+            if (board[0][col].equals(player) && board[1][col].equals(player) && board[2][col].equals(player)) {
                 return true;
             }
         }
@@ -171,11 +179,16 @@ public class TicTacToe
 
     private static boolean isDiagonalWin(String player)
     {
-        if (board[0][0].equals(player) && board[1][1].equals(player) && board[2][2].equals(player) || board[0][2].equals(player) && board[1][1].equals(player) && board[2][1].equals(player))
+        if ((board[0][0].equals(player) && board[1][1].equals(player) && board[2][2].equals(player)) || (board[0][2].equals(player) && board[1][1].equals(player) && board[2][0].equals(player)))
         {
             return true;
         }
         return false; // no diagonal win
+    }
+
+    private static boolean isTie(int moveCnt, String player)
+    {
+        return !isWin(player);
     }
 
 }
